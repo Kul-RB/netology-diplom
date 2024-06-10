@@ -33,17 +33,17 @@
 5. В случае использования [Terraform Cloud](https://app.terraform.io/) в качестве [backend](https://www.terraform.io/docs/language/settings/backends/index.html) убедитесь, что применение изменений успешно проходит, используя web-интерфейс Terraform cloud.
 
 ### Решение
-1. С помощью Terraform создал новый сервисный аккаунт с правилами для 
+1. С помощью Terraform создал новый сервисный аккаунт с правилами для (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform_state_config/sa.tf)
     а. ObjectStorage (storage.editor) - для хранения state Terraform
     б. Compute (compute.admin) - для создания ВМ и управления ими
     в. KMS (kms.editor) - для шифрования ObjectStorage
     г. Resource Manager (resource-manager.editor) 
     д. VPC (vpc.admin) - для создания VPC
    Далее получил access_key и secret_key для работы с ObjectStorage
-1.1 Создал bucket в YandexObjectStorage и включил шифрование
+1.1 Создал bucket в YandexObjectStorage и включил шифрование (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform_state_config/s3.tf)
 
-2. Подготовил backend для Terraform, инициализация с помощью terraform init -backend-config="access_key=$(cat .access_key)" -backend-config="secret_key=$(.secret_key)". Файлы .secret_key и .access_key сохранились при создании сервисного аккаунта и bucket
-3. Создал VPC, и 3 подсети в разных зонах:
+2. Подготовил backend для Terraform, инициализация с помощью terraform init -backend-config="access_key=$(cat .access_key)" -backend-config="secret_key=$(.secret_key)". Файлы .secret_key и .access_key сохранились при создании сервисного аккаунта и bucket (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform/providers.tf)
+3. Создал VPC, и 3 подсети в разных зонах (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform/k8s/main.tf):
     а. subnet-a (ru-central1-a)
     б. subnet-b (ru-central1-b)
     в. subnet-d (ru-central1-d)
@@ -63,13 +63,13 @@
 ### Решение
 
 Я выбрал рекомендуемый вариант установки K8s класетра с помощью Ansible
-1.  При помощт Terraform установил 7 машин (3 control-plane, 3 worer-node(на них распологается и etcd), 1 LoadBalancer для Control-plane на основе Haproxy). Машины находятся в разных зонах:
+1.  При помощт Terraform установил 7 машин (3 control-plane (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform/k8s/k8s-master.tf), 3 worer-node(на них распологается и etcd https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform/k8s/k8s-nodes.tf), 1 LoadBalancer для Control-plane на основе Haproxy (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform/k8s/lb-cp-k8s.tf)). Машины находятся в разных зонах:
 ![image](https://github.com/Kul-RB/netology-diplom/assets/53901269/bc210918-f230-4e64-bd6d-aa44a7034278)
 
 ![image](https://github.com/Kul-RB/netology-diplom/assets/53901269/94a815a7-09fc-42af-b83c-5b99ffc9e830)
 
-2. Подготовил конфигурацию kubespray: host.yaml, all.yaml заполнил с помощью Terraform Template
-2.1 Также написал отдельный playbook для конфигурации LoadBalancer для Control-Plane, установка, настройка и запуск Haproxy (запуск данного Playbook выполнял с помощью Terraform local-exec)
+2. Подготовил конфигурацию kubespray: host.yaml (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/ansible/kubespray/inventory/k8s.netology.cluster/hosts.yaml), all.yaml (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/ansible/kubespray/inventory/k8s.netology.cluster/group_vars/all/all.yml) заполнил с помощью Terraform Template
+2.1 Также написал отдельный playbook (https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/ansible/config_lb_cp/main.yaml) для конфигурации LoadBalancer для Control-Plane, установка, настройка и запуск Haproxy (запуск данного Playbook выполнял с помощью Terraform local-exec)(https://github.com/Kul-RB/netology-diplom/blob/b11ca8edf1b591f4605e6b4bc9db36b705527966/terraform/k8s/ansible.tf) 
 
 3. Запустил Playbook для установки K8s с помощью kubespray
 3.1 После установки скопировал admin.conf на своб машину для доступа kubectl к кластеру
