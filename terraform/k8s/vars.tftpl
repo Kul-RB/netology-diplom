@@ -1,0 +1,9 @@
+---
+package: "haproxy"
+dest_path: "/etc/haproxy/haproxy.cfg"
+%{~ for k,v in webservers ~}
+%{~ for i in v ~}
+
+${i["name"]}: "${i["network_interface"][0]["ip_address"]}"
+%{~ endfor ~}
+%{~ endfor ~}

@@ -1,0 +1,23 @@
+replicaCount: 3
+maxUnavailable: 20%
+maxSurge: 5
+
+application:
+  name: nginx
+  selector: carfnginxixfront
+  name_secret: regcrednginx
+  container:
+    port: 80
+  startupProbe:
+    second: 10
+    periodSecond: 5
+    failureThreshold: 1
+  livenessProbe:
+    path: /index.html
+    second: 20
+    periodSecond: 10
+  svc:
+    name: nginx
+    type: ClusterIP
+  ingress:
+    name: nginx

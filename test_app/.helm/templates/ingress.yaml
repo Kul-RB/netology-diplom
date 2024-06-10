@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.application.ingress.name }}
+  namespace: {{ .Values.application.namespace }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+       - pathType: ImplementationSpecific
+         path: "/"
+         backend:
+           service:
+             name: {{ .Values.application.svc.name }}
+             port:
+               number: 80

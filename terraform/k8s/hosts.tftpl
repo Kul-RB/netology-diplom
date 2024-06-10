@@ -1,0 +1,47 @@
+all:
+  hosts:
+%{~ for k,v in webservers ~}
+%{~ for i in v ~}
+
+    ${i["name"]}:
+      ansible_host: "${i["network_interface"][0]["nat_ip_address"]}"
+      ip: ${i["network_interface"][0]["ip_address"]} 
+      access_ip: ${i["network_interface"][0]["ip_address"]}
+      ansible_user: ubuntu
+%{~ endfor ~}
+%{~ endfor ~}
+
+  children:
+    kube_control_plane:
+      hosts: %{~ for k,v in webservers ~}
+    %{~ for i in v ~}
+    %{~ if "${k}"=="cp" }    
+        ${i["name"]}: %{ else ~} 
+    %{ endif ~}
+    %{~ endfor ~}
+    %{~ endfor ~}
+    
+    kube_node:
+      hosts: %{~ for k,v in webservers ~}
+    %{~ for i in v ~}
+    %{~ if "${k}"=="node" }    
+       ${i["name"]}: %{~ else ~}
+    %{~ endif ~}
+    %{~ endfor ~}
+    %{~ endfor ~}
+    
+    etcd:
+      hosts: %{~ for k,v in webservers ~}
+    %{~ for i in v ~}
+    %{~ if "${k}"=="node" }    
+       ${i["name"]}: %{~ else ~}
+    %{~ endif ~}
+    %{~ endfor ~}
+    %{~ endfor ~}
+    
+    k8s_cluster:
+      children:
+        kube_control_plane:
+        kube_node:
+    calico_rr:
+      hosts: {}

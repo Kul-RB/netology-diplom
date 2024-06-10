@@ -1,0 +1,7 @@
+lbcp:
+  hosts:
+    lbcp:
+      ansible_host:  178.154.225.161 
+      ip: 192.168.20.8 
+      access_ip: 192.168.20.8
+      ansible_user: ubuntu

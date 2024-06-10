@@ -1,0 +1,24 @@
+- name: Config lb
+  hosts: lbcp
+  become: true
+  handlers:
+    - name: Restart haproxy
+      service:
+        name: "{{ package }}"
+        state: restarted
+  tasks:
+  - name: Update packages
+    apt:
+      update_cache: yes  
+
+  - name: Install HAproxy  
+    apt:
+      name: "{{ package }}"
+      state: latest
+    
+  - name: Configure HAProxy
+    template:
+      src: "haproxy.j2"
+      dest: "{{ dest_path }}" 
+    notify: 
+      - Restart haproxy

@@ -1,0 +1,11 @@
+%{~ for k,v in webservers ~}
+%{~ for i in v ~}
+${i["name"]}:
+  hosts:
+    ${i["name"]}:
+      ansible_host: %{ if "${i["network_interface"][0]["nat_ip_address"]}"==""} ${i["network_interface"][0]["ip_address"]} %{else} ${i["network_interface"][0]["nat_ip_address"]} %{ endif }
+      ip: ${i["network_interface"][0]["ip_address"]} 
+      access_ip: ${i["network_interface"][0]["ip_address"]}
+      ansible_user: ubuntu
+%{~ endfor ~}
+%{~ endfor ~}
